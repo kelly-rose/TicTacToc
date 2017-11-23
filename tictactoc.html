@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: "Roboto", Arial, sans-serif;
+            margin: 0 auto;
+            /*text-align: center;*/
+            margin-top: 50px;
+            color: #FFF;
+            /*text-shadow: -1px -1px #333;*/
+            background: #333;
+        }
+
+        body h1 {
+            font-weight: normal;
+        }
+
+        body .turn {
+            margin-bottom: 10px;
+        }
+
+        body table {
+            border-collapse: collapse;
+            width: 150px;
+            margin: 0 auto;
+        }
+
+        body table td {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #555;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        body table td:before {
+            font-size: 1.5em;
+            line-height: 1;
+        }
+
+        body table td.cross:before {
+            content: "x";
+            color: lightblue;
+        }
+
+        body table td.circle:before {
+            content: "o";
+            color: pink;
+        }
+        body table td.fill {
+            background-color:#007bff;
+        }
+
+        /*body .reset {*/
+        /*background: #555;*/
+        /*border: 1px solid #333;*/
+        /*padding: 5px 10px;*/
+        /*color: #FFF;*/
+        /*cursor: pointer;*/
+        /*font-family: "Roboto", Arial, sans-serif;*/
+        /*text-transform: uppercase;*/
+        /*}*/
+        /*body .reset:hover {*/
+        /*opacity: 0.8;*/
+        /*}*/
+
+
+    </style>
+</head>
+<body>
+
+
+<div class="container">
+    <h1 style="text-align: center; margin-bottom: 40px">
+        Very simple jQuery Tic Tac Toe
+    </h1>
+    <div class="row">
+        <div class="col">
+            <div class="content-left" style="padding-top: 30px;">
+                <div style="text-align: center" class="messages"></div>
+                <div style="text-align: center" class="turn"></div>
+
+                <table>
+
+                    <tr>
+                        <td class="item1"></td>
+                        <td class="item2"></td>
+                        <td class="item3"></td>
+                    </tr>
+                    <tr>
+                        <td class="item4"></td>
+                        <td class="item5"></td>
+                        <td class="item6"></td>
+                    </tr>
+                    <tr>
+                        <td class="item7"></td>
+                        <td class="item8"></td>
+                        <td class="item9"></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 40px">
+                <button type="button" class="btn btn-primary start">Start</button>
+                <button type="button" class="btn btn-secondary reset">Reset</button>
+                <button type="button" class="btn btn-light my-close">Close</button>
+            </div>
+
+        </div>
+        <div class="col">
+            <div style="display: inline-block" class="content-right">
+
+                <h2>Current Game Stats</h2>
+
+                <div class="card text-white cur-game-stats" style="max-width: 20rem; background-color: #333333;border: none"></div>
+
+                <div>
+                    <!-- Button trigger modal -->
+                    <button id="myModal" style="margin:10px 0 10px 0; width: 100%" type="button" class="btn btn-warning"
+                            data-toggle="modal"
+                            data-target="#exampleModal">
+                        Championship Stats
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: #333;" id="exampleModalLabel">Championship Stats</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+        integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+        integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+        crossorigin="anonymous"></script>
+<script>
+
+    let chapmp = [];
+
+    //TImer
+    let timerTime = 0;
+    let isRunning = false;
+    let interval;
+    let player1_time = [];
+    let player2_time = [];
+
+    //Clicked Count
+    const clickCount = {cross: 0, circle: 0};   //A cross is a player1, A circle is a player2.
+
+    $(function () {
+
+        var startFlag = false;
+        var player = 1;
+        var table = $('table');
+        var messages = $('.messages');
+        var turn = $('.turn');
+        var modalBody = $('.modal-body');
+        var curGameStats = $('.cur-game-stats');
+
+
+        turn.html('Click Start Button !');
+
+        $('td').click(function () {
+            if (!startFlag) {
+                turn.html('Click Start Button !');
+                return;
+            }
+            td = $(this);
+            var state = getState(td);
+            if (!state) {
+                var pattern = definePatternForCurrentPlayer(player, clickCount);
+                changeState(td, pattern);
+
+                resetTimer(player);
+
+                if (checkIfPlayerWon(table, pattern)) {
+                    chapmp.push(player);
+                    messages.html('Player ' + player + ' has won.');
+
+                    resultCurGame(curGameStats, turn);
+
+                } else {
+                    if (clickCount['cross'] + clickCount['circle'] === 9) {
+                        chapmp.push('draw');
+                        messages.html('Players have drawn.');
+
+                        resultCurGame(curGameStats, turn);
+                        return;
+                    }
+                    player = setNextPlayer(player);
+                    displayNextPlayer(turn, player);
+                    startTimer();
+                }
+            } else {
+                messages.html('This box is already checked.');
+            }
+        });
+
+        $('.reset').click(function () {
+            startFlag = false;
+            curGameStats.html('');
+            clickCount['cross'] = 0;
+            clickCount['circle'] = 0;
+            resetTimer();
+            player1_time = [];
+            player2_time = [];
+            player = 1;
+            messages.html('');
+            reset(table);
+            turn.html('Click Start Button !');
+
+        });
+
+        $('#myModal').click(function () {
+            console.log(chapmp);
+            let chapmpList = '';
+            let loser = 0;
+
+            chapmp.forEach((winner, i) => {
+                if (winner === 1) {
+                    loser = 2;
+                    chapmpList = chapmpList + '<li>Game ' + (i + 1) + ' Stats : Player ' + winner + '(Win), Player ' + loser + '(Lose)</li>'
+
+                } else if (winner === 2) {
+                    loser = 1;
+                    chapmpList = chapmpList + '<li>Game ' + (i + 1) + ' Stats : Player ' + winner + '(Win), Player ' + loser + '(Lose)</li>'
+
+                } else {
+                    chapmpList = chapmpList + '<li>Game ' + (i + 1) + ' Stats : DRAW</li>'
+                }
+
+            });
+
+            modalBody.html('<ul style="color: #333;">' + chapmpList + '</ul>');
+
+        });
+
+
+        $('.start').click(function () {
+
+            startFlag = true;
+
+            console.log(player);
+            displayNextPlayer(turn, player);
+
+            startTimer();
+        });
+
+        $('.my-close').click(function () {
+            window.close();
+        });
+
+    });
+
+    function resultCurGame(curGameStats, turn) {
+        let player1_sum = 0;
+        let player2_sum = 0;
+
+        for (let time of player1_time) {
+            player1_sum = time + player1_sum;
+        }
+        for (let time of player2_time) {
+            player2_sum = time + player2_sum;
+        }
+
+        curGameStats.html(' <div class="card-body" style="margin-top: -18px; margin-bottom: -20px;">' +
+            '                        <h5 class="card-title">Player 1</h5>' +
+            '                        <p class="card-text">average time : ' + (player1_sum / clickCount['cross']).toFixed(2) + ' sec. </p><p>clicked count : ' + clickCount['cross'] + '</p>' +
+            '                        <h5 class="card-title">Player 2</h5>' +
+            '                        <p class="card-text">average time : ' + (player2_sum / clickCount['circle']).toFixed(2) + ' sec. </p><p>clicked count : ' + clickCount['circle'] + '</p>' +
+            '                    </div>')
+        turn.html('');
+    }
+
+    function startTimer() {
+        if (isRunning) return;
+        isRunning = true;
+        interval = setInterval(incrementTimer, 1000);
+    }
+
+    function stopTimer() {
+        if (!isRunning) return;
+        isRunning = false;
+
+        clearInterval(interval);
+    }
+
+    function resetTimer(player) {
+        stopTimer();
+        if (player == 1) {
+            player1_time.push(timerTime);
+        } else {
+            player2_time.push(timerTime);
+        }
+        timerTime = 0;
+    }
+
+    function incrementTimer() {
+        timerTime++;
+    }
+
+    function getState(td) {
+        if (td.hasClass('cross') || td.hasClass('circle')) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    function changeState(td, pattern) {
+        return td.addClass(pattern);
+    }
+
+    function definePatternForCurrentPlayer(player, clickCount) {
+        if (player == 1) {
+            clickCount['cross']++;
+
+            return 'cross';
+        } else {
+            clickCount['circle']++;
+
+            return 'circle';
+        }
+    }
+
+    function setNextPlayer(player) {
+        if (player == 1) {
+            return player = 2;
+        } else {
+            return player = 1;
+        }
+    }
+
+    function displayNextPlayer(turn, player) {
+        turn.html('Player turn : ' + player);
+    }
+
+    function checkIfPlayerWon(table, pattern) {
+        var won = 0;
+
+        if (table.find('.item1').hasClass(pattern) && table.find('.item2').hasClass(pattern) && table.find('.item3').hasClass(pattern)) {
+            $('.item1').addClass('fill');
+            $('.item2').addClass('fill');
+            $('.item3').addClass('fill');
+            won = 1;
+        } else if (table.find('.item1').hasClass(pattern) && table.find('.item4').hasClass(pattern) && table.find('.item7').hasClass(pattern)) {
+            $('.item1').addClass('fill');
+            $('.item4').addClass('fill');
+            $('.item7').addClass('fill');
+            won = 1;
+        } else if (table.find('.item1').hasClass(pattern) && table.find('.item5').hasClass(pattern) && table.find('.item9').hasClass(pattern)) {
+            $('.item1').addClass('fill');
+            $('.item5').addClass('fill');
+            $('.item9').addClass('fill');
+            won = 1;
+        } else if (table.find('.item4').hasClass(pattern) && table.find('.item5').hasClass(pattern) && table.find('.item6').hasClass(pattern)) {
+            $('.item4').addClass('fill');
+            $('.item5').addClass('fill');
+            $('.item6').addClass('fill');
+            won = 1;
+        } else if (table.find('.item7').hasClass(pattern) && table.find('.item8').hasClass(pattern) && table.find('.item9').hasClass(pattern)) {
+            $('.item7').addClass('fill');
+            $('.item8').addClass('fill');
+            $('.item9').addClass('fill');
+            won = 1;
+        } else if (table.find('.item2').hasClass(pattern) && table.find('.item5').hasClass(pattern) && table.find('.item8').hasClass(pattern)) {
+            $('.item2').addClass('fill');
+            $('.item5').addClass('fill');
+            $('.item8').addClass('fill');
+            won = 1;
+        } else if (table.find('.item3').hasClass(pattern) && table.find('.item6').hasClass(pattern) && table.find('.item9').hasClass(pattern)) {
+            $('.item3').addClass('fill');
+            $('.item6').addClass('fill');
+            $('.item9').addClass('fill');
+            won = 1;
+        } else if (table.find('.item3').hasClass(pattern) && table.find('.item5').hasClass(pattern) && table.find('.item7').hasClass(pattern)) {
+            $('.item3').addClass('fill');
+            $('.item5').addClass('fill');
+            $('.item7').addClass('fill');
+            won = 1;
+        }
+        return won;
+    }
+
+    function reset(table) {
+        table.find('td').each(function () {
+            $(this).removeClass('circle').removeClass('cross').removeClass('fill');
+        });
+    }
+</script>
+</html>
