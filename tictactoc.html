@@ -168,6 +168,10 @@
 
     let chapmp = [];
 
+    let startFlag = false;
+    let won = 0;
+
+
     //TImer
     let timerTime = 0;
     let isRunning = false;
@@ -180,7 +184,6 @@
 
     $(function () {
 
-        var startFlag = false;
         var player = 1;
         var table = $('table');
         var messages = $('.messages');
@@ -188,14 +191,22 @@
         var modalBody = $('.modal-body');
         var curGameStats = $('.cur-game-stats');
 
-
         turn.html('Click Start Button !');
 
+
+
         $('td').click(function () {
-            if (!startFlag) {
+            if (!won && !startFlag) {
                 turn.html('Click Start Button !');
                 return;
             }
+
+            if (won && !startFlag) {
+                turn.html('Click Reset Button !');
+                return;
+            }
+
+
             td = $(this);
             var state = getState(td);
             if (!state) {
@@ -204,18 +215,19 @@
 
                 resetTimer(player);
 
-                if (checkIfPlayerWon(table, pattern)) {
+                if (checkIfPlayerWon(table, pattern) && startFlag) {
                     chapmp.push(player);
                     messages.html('Player ' + player + ' has won.');
-
                     resultCurGame(curGameStats, turn);
+                    return;
 
                 } else {
-                    if (clickCount['cross'] + clickCount['circle'] === 9) {
+                    if (clickCount['cross'] + clickCount['circle'] === 9 && startFlag) {
                         chapmp.push('draw');
                         messages.html('Players have drawn.');
 
                         resultCurGame(curGameStats, turn);
+                        won=1;
                         return;
                     }
                     player = setNextPlayer(player);
@@ -229,6 +241,8 @@
 
         $('.reset').click(function () {
             startFlag = false;
+            won = 0;
+
             curGameStats.html('');
             clickCount['cross'] = 0;
             clickCount['circle'] = 0;
@@ -269,6 +283,11 @@
 
         $('.start').click(function () {
 
+            if(won&&!startFlag){
+                turn.html('Click Reset Button !');
+                return;
+            }
+
             startFlag = true;
 
             console.log(player);
@@ -283,7 +302,8 @@
 
     });
 
-    function resultCurGame(curGameStats, turn) {
+    function resultCurGame( curGameStats, turn) {
+        startFlag= false;
         let player1_sum = 0;
         let player2_sum = 0;
 
@@ -367,7 +387,7 @@
     }
 
     function checkIfPlayerWon(table, pattern) {
-        var won = 0;
+//        var won = 0;
 
         if (table.find('.item1').hasClass(pattern) && table.find('.item2').hasClass(pattern) && table.find('.item3').hasClass(pattern)) {
             $('.item1').addClass('fill');
